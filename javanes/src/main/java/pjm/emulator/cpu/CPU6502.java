@@ -28,7 +28,7 @@ public class CPU6502 implements ICPU
         AC = 0;
         X = 0;
         Y = 0;
-        PC = (char) 0xFFFC;
+        PC = 0xFFFC;
         SP = 0x0100;
         SR.reset();
     }
@@ -37,11 +37,12 @@ public class CPU6502 implements ICPU
     public int execute(int cyclesRequested, IMemory memory) {
         AtomicInteger cyclesExecuted = new AtomicInteger(0); // Use proper object for updating
         while(cyclesExecuted.get() < cyclesRequested) {
-            OpCode instruction = getNextInstruction(cyclesExecuted, memory.getByte(SP++));
+            OpCode instruction = getNextInstruction(cyclesExecuted, memory.getByte(PC));
             switch(instruction) {
                 case LDA_I:
-                    System.out.println("Executing Load Accumulator Instuction");
-                    AC = fetchByte(cyclesExecuted, SP++, memory);
+                    AC = fetchByte(cyclesExecuted, PC, memory);
+                    SR.setZero(AC == 0);
+                    SR.setNegative(AC < 0);
                     break;
                 default:
                     System.err.println("Unhandled Instruction: " + instruction);
@@ -54,11 +55,13 @@ public class CPU6502 implements ICPU
 
     public OpCode getNextInstruction(AtomicInteger cyclesExecuted, byte value) {
         cyclesExecuted.incrementAndGet();
+        PC++;
         return OpCodes.getCode(value);
     }
 
     public byte fetchByte(AtomicInteger cyclesExecuted, char location, IMemory memory) {
         cyclesExecuted.incrementAndGet();
+        PC++;
         return memory.getByte(location);
     }
 
