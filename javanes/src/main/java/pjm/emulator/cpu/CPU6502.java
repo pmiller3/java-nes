@@ -90,9 +90,8 @@ public class CPU6502 implements ICPU
         byte lowByte = fetchByte(cyclesExecuted, location, memory);
         byte highByte = fetchByte(cyclesExecuted, ++location, memory);
         char word = (char) (highByte << 8);
-        word |= lowByte;
-        System.out.println("Bytes: " + highByte + " | " + lowByte + " = int " + (int) word + " or char " + word);
-        return word; // bitwise or
+        word |= lowByte; // bitwise or
+        return word; 
     }
     
     private char fetchZeroPageAsWord(AtomicInteger cyclesExecuted, char location, IMemory memory) {
