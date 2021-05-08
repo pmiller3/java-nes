@@ -28,12 +28,12 @@ public class CPU6502Tests
     }
 
     @Test
-    public void shouldExecuteLDA() {
+    public void shouldExecuteLDA_I() {
         // Given
         CPU6502 cpu = new CPU6502();
         IMemory memory = new Memory64k();
         char location = cpu.getSP();
-        memory.setByte(location, OpCode.LDA.byteCode());
+        memory.setByte(location, OpCode.LDA_I.byteCode());
         memory.setByte(++location, (byte)0x12);
 
         // When

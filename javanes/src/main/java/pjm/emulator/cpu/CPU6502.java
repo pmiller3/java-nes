@@ -39,7 +39,7 @@ public class CPU6502 implements ICPU
         while(cyclesExecuted.get() < cyclesRequested) {
             OpCode instruction = getNextInstruction(cyclesExecuted, memory.getByte(SP++));
             switch(instruction) {
-                case LDA:
+                case LDA_I:
                     System.out.println("Executing Load Accumulator Instuction");
                     AC = fetchByte(cyclesExecuted, SP++, memory);
                     break;
