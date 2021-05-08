@@ -1,5 +1,7 @@
 package pjm.emulator.cpu;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import pjm.emulator.cpu.OpCodes.OpCode;
 import pjm.emulator.memory.IMemory;
 
@@ -33,24 +35,31 @@ public class CPU6502 implements ICPU
 
     @Override
     public int execute(int cyclesRequested, IMemory memory) {
-        int cyclesExecuted = 0;
-        while(cyclesExecuted < cyclesRequested) {
-            OpCode instruction = getNextInstruction(memory.getByte(SP));
+        AtomicInteger cyclesExecuted = new AtomicInteger(0); // Use proper object for updating
+        while(cyclesExecuted.get() < cyclesRequested) {
+            OpCode instruction = getNextInstruction(cyclesExecuted, memory.getByte(SP++));
             switch(instruction) {
                 case LDA:
                     System.out.println("Executing Load Accumulator Instuction");
+                    AC = fetchByte(cyclesExecuted, SP++, memory);
                     break;
                 default:
                     System.err.println("Unhandled Instruction: " + instruction);
+                    cyclesExecuted.incrementAndGet();
                     break;
             }
-            cyclesExecuted++;
         }
-        return cyclesExecuted;
+        return cyclesExecuted.get();
     }
 
-    public OpCode getNextInstruction(byte value) {
+    public OpCode getNextInstruction(AtomicInteger cyclesExecuted, byte value) {
+        cyclesExecuted.incrementAndGet();
         return OpCodes.getCode(value);
+    }
+
+    public byte fetchByte(AtomicInteger cyclesExecuted, char location, IMemory memory) {
+        cyclesExecuted.incrementAndGet();
+        return memory.getByte(location);
     }
 
     public byte getA() {

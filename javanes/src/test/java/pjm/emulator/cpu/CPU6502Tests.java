@@ -32,13 +32,15 @@ public class CPU6502Tests
         // Given
         CPU6502 cpu = new CPU6502();
         IMemory memory = new Memory64k();
-        memory.setByte(cpu.getSP(), OpCode.LDA.byteCode());
+        char location = cpu.getSP();
+        memory.setByte(location, OpCode.LDA.byteCode());
+        memory.setByte(++location, (byte)0x12);
 
         // When
-        int cyclesExecuted = cpu.execute(2, memory);
+        int cyclesExecuted = cpu.execute(1, memory);
 
         // Then
         assertEquals(2, cyclesExecuted);
-        assertEquals(ZERO, cpu.getA());
+        assertEquals(0x12, cpu.getA());
     }
 }
