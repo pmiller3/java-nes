@@ -2,6 +2,6 @@ package pjm.emulator.memory;
 
 public interface IMemory {
     void reset();
-    byte getByte( int address );
-    void setByte( int address, byte value);
+    byte getByte( char address );
+    void setByte( char address, byte value);
 }

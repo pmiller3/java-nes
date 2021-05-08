@@ -1,5 +1,6 @@
 package pjm.emulator.cpu;
 
+import pjm.emulator.cpu.OpCodes.OpCode;
 import pjm.emulator.memory.IMemory;
 
 /**
@@ -11,8 +12,8 @@ public class CPU6502 implements ICPU
     private byte AC; // Accumulator: byte-wide and along with the arithmetic logic unit (ALU), supports using the status register for carrying, overflow detection, and so on.
     private byte X; // Indexes X and Y are byte-wide and used for several addressing modes. 
     private byte Y; // They can be used as loop counters easily, using INC/DEC and branch instructions. Not being the accumulator, they have limited addressing modes themselves when loading and saving.
-    private short PC; // Program Counter: 2-byte supports 65536 direct (unbanked) memory locations, however not all values are sent to the cartridge. It can be accessed either by allowing CPU's internal fetch logic increment the address bus, an interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch instructions.
-    private short SP; // Stack Pointer: byte-wide and can be accessed using interrupts, pulls, pushes, and transfers.
+    private char PC; // Program Counter: 2-byte supports 65536 direct (unbanked) memory locations, however not all values are sent to the cartridge. It can be accessed either by allowing CPU's internal fetch logic increment the address bus, an interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch instructions.
+    private char SP; // Stack Pointer: byte-wide and can be accessed using interrupts, pulls, pushes, and transfers.
     private StatusRegister SR; // Status Register: 6 bits used by the ALU but is byte-wide. PHP, PLP, arithmetic, testing, and branch instructions can access this register.
 
     public CPU6502() {
@@ -25,7 +26,7 @@ public class CPU6502 implements ICPU
         AC = 0;
         X = 0;
         Y = 0;
-        PC = (short) 0xFFFC;
+        PC = (char) 0xFFFC;
         SP = 0x0100;
         SR.reset();
     }
@@ -34,9 +35,9 @@ public class CPU6502 implements ICPU
     public int execute(int cyclesRequested, IMemory memory) {
         int cyclesExecuted = 0;
         while(cyclesExecuted < cyclesRequested) {
-            OpCode instruction = getNextInstruction();
+            OpCode instruction = getNextInstruction(memory.getByte(SP));
             switch(instruction) {
-                case LOAD_ACCUMULATOR:
+                case LDA:
                     System.out.println("Executing Load Accumulator Instuction");
                     break;
                 default:
@@ -48,8 +49,8 @@ public class CPU6502 implements ICPU
         return cyclesExecuted;
     }
 
-    public OpCode getNextInstruction() {
-        return OpCode.valueOf("LDA");
+    public OpCode getNextInstruction(byte value) {
+        return OpCodes.getCode(value);
     }
 
     public byte getA() {
@@ -64,11 +65,11 @@ public class CPU6502 implements ICPU
         return Y;
     }
     
-    public short getPC() {
+    public char getPC() {
         return PC;
     }
 
-    public short getSP() {
+    public char getSP() {
         return SP;
     }
 

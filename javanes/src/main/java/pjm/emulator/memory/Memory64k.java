@@ -16,20 +16,16 @@ public class Memory64k implements IMemory {
             memory[i] = EMPTY;
     }
 
+    // chars are two bytes wide, unsigned
+    // therefore guaranteed to fit in memory
+    // of precisely this size.
     @Override
-    public byte getByte(int address) {
-        checkAddress(address);
+    public byte getByte(char address) {
         return memory[address];
     }
 
     @Override
-    public void setByte(int address, byte value) {
-        checkAddress(address);
+    public void setByte(char address, byte value) {
         memory[address] = value;
-    }
-
-    private void checkAddress(int address) {
-        if(address < 0 || address >= MAX_MEMORY)
-            throw new IllegalArgumentException("Memory access out of bounds: " + address);
     }
 }

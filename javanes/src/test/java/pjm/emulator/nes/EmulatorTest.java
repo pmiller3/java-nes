@@ -1,7 +1,6 @@
 package pjm.emulator.nes;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -18,6 +17,6 @@ public class EmulatorTest
     {
         Emulator emulator = new Emulator();
         assertNotNull(emulator);
-        
+    
     }
 }
