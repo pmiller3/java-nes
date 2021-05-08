@@ -13,12 +13,12 @@ public class CPU6502Tests
     public void shouldInitializeCPU()
     {
         CPU6502 cpu = new CPU6502();
-        Byte zero = 0;
+        byte zero = 0;
         assertEquals(zero, cpu.getA());
         assertEquals(zero, cpu.getX());
         assertEquals(zero, cpu.getY());
-        assertEquals(0xFFFC, cpu.getPC());
-        assertEquals(0x0100, cpu.getSP());
+        assertEquals(0, Short.compareUnsigned((short) 0xFFFC, cpu.getPC()));
+        assertEquals(0, Short.compareUnsigned((short) 0x0100, cpu.getSP()));
         assertEquals(new StatusRegister().getFlags(), cpu.getSR().getFlags());
     }
 }

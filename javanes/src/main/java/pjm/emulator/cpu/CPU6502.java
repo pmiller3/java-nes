@@ -8,11 +8,11 @@ import pjm.emulator.memory.IMemory;
  */
 public class CPU6502 implements ICPU
 {
-    private Byte AC; // Accumulator: byte-wide and along with the arithmetic logic unit (ALU), supports using the status register for carrying, overflow detection, and so on.
-    private Byte X; // Indexes X and Y are byte-wide and used for several addressing modes. 
-    private Byte Y; // They can be used as loop counters easily, using INC/DEC and branch instructions. Not being the accumulator, they have limited addressing modes themselves when loading and saving.
-    private int PC; // Program Counter: 2-byte supports 65536 direct (unbanked) memory locations, however not all values are sent to the cartridge. It can be accessed either by allowing CPU's internal fetch logic increment the address bus, an interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch instructions.
-    private int SP; // Stack Pointer: byte-wide and can be accessed using interrupts, pulls, pushes, and transfers.
+    private byte AC; // Accumulator: byte-wide and along with the arithmetic logic unit (ALU), supports using the status register for carrying, overflow detection, and so on.
+    private byte X; // Indexes X and Y are byte-wide and used for several addressing modes. 
+    private byte Y; // They can be used as loop counters easily, using INC/DEC and branch instructions. Not being the accumulator, they have limited addressing modes themselves when loading and saving.
+    private short PC; // Program Counter: 2-byte supports 65536 direct (unbanked) memory locations, however not all values are sent to the cartridge. It can be accessed either by allowing CPU's internal fetch logic increment the address bus, an interrupt (NMI, Reset, IRQ/BRQ), and using the RTS/JMP/JSR/Branch instructions.
+    private short SP; // Stack Pointer: byte-wide and can be accessed using interrupts, pulls, pushes, and transfers.
     private StatusRegister SR; // Status Register: 6 bits used by the ALU but is byte-wide. PHP, PLP, arithmetic, testing, and branch instructions can access this register.
 
     public CPU6502() {
@@ -25,7 +25,7 @@ public class CPU6502 implements ICPU
         AC = 0;
         X = 0;
         Y = 0;
-        PC = 0xFFFC;
+        PC = (short) 0xFFFC;
         SP = 0x0100;
         SR.reset();
     }
@@ -52,23 +52,23 @@ public class CPU6502 implements ICPU
         return OpCode.valueOf("LDA");
     }
 
-    public Byte getA() {
+    public byte getA() {
         return AC;
     }
 
-    public Byte getX() {
+    public byte getX() {
         return X;
     }
 
-    public Byte getY() {
+    public byte getY() {
         return Y;
     }
     
-    public int getPC() {
+    public short getPC() {
         return PC;
     }
 
-    public int getSP() {
+    public short getSP() {
         return SP;
     }
 
