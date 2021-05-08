@@ -26,6 +26,7 @@ public class OpCodes {
     }
 
     public enum OpCode {
+        // LDA - Load Accumulator with Memory -> AC, N, Z
         LDA_I((byte) 0xA9),
         LDA_Z((byte) 0xA5),
         LDA_Z_X((byte) 0xB5),

@@ -39,30 +39,91 @@ public class CPU6502 implements ICPU
         while(cyclesExecuted.get() < cyclesRequested) {
             OpCode instruction = getNextInstruction(cyclesExecuted, memory.getByte(PC));
             switch(instruction) {
-                case LDA_I:
-                    AC = fetchByte(cyclesExecuted, PC, memory);
-                    SR.setZero(AC == 0);
-                    SR.setNegative(AC < 0);
+                case LDA_I: {
+                    performLDA(cyclesExecuted, PC, memory);
                     break;
-                default:
+                }
+                case LDA_Z: {
+                    char address = fetchZeroPageAsWord(cyclesExecuted, PC, memory);
+                    performLDA(cyclesExecuted, address, memory);
+                    break;
+                }
+                case LDA_Z_X: {
+                    char address = fetchZeroPageAsWord(cyclesExecuted, PC, memory);
+                    address += fetchX(cyclesExecuted);
+                    performLDA(cyclesExecuted, address, memory);
+                    break;
+                }
+                case LDA_A: {
+                    char address = fetchWord(cyclesExecuted, PC, memory);
+                    performLDA(cyclesExecuted, address, memory);
+                    break;
+                }
+                default: {
                     System.err.println("Unhandled Instruction: " + instruction);
                     cyclesExecuted.incrementAndGet();
                     break;
+                }
             }
         }
         return cyclesExecuted.get();
     }
 
-    public OpCode getNextInstruction(AtomicInteger cyclesExecuted, byte value) {
+    private void performLDA(AtomicInteger cyclesExecuted, char address, IMemory memory) {
+        setAC(fetchByte(cyclesExecuted, address, memory));
+    }
+
+    private OpCode getNextInstruction(AtomicInteger cyclesExecuted, byte value) {
         cyclesExecuted.incrementAndGet();
         PC++;
         return OpCodes.getCode(value);
     }
 
-    public byte fetchByte(AtomicInteger cyclesExecuted, char location, IMemory memory) {
+    private byte fetchByte(AtomicInteger cyclesExecuted, char location, IMemory memory) {
         cyclesExecuted.incrementAndGet();
         PC++;
         return memory.getByte(location);
+    }
+
+    private char fetchWord(AtomicInteger cyclesExecuted, char location, IMemory memory) {
+        // 6502 is little endian - the low byte is first
+        byte lowByte = fetchByte(cyclesExecuted, location, memory);
+        byte highByte = fetchByte(cyclesExecuted, ++location, memory);
+        char word = (char) (highByte << 8);
+        word |= lowByte;
+        System.out.println("Bytes: " + highByte + " | " + lowByte + " = int " + (int) word + " or char " + word);
+        return word; // bitwise or
+    }
+    
+    private char fetchZeroPageAsWord(AtomicInteger cyclesExecuted, char location, IMemory memory) {
+        return (char) fetchByte(cyclesExecuted, location, memory);
+    }
+
+    // Zero page reads don't increment Program Counter, but do take a clock cycle
+    private byte readByte(AtomicInteger cyclesExecuted, byte location, IMemory memory) {
+        cyclesExecuted.incrementAndGet();
+        return memory.getByte((char) location);
+    }
+
+    private void setX(AtomicInteger cyclesExecuted, byte value) {
+        X = value;
+        cyclesExecuted.incrementAndGet();
+    }
+
+    private byte fetchX(AtomicInteger cyclesExecuted) {
+        cyclesExecuted.incrementAndGet();
+        return X;
+    }
+
+    private void setY(AtomicInteger cyclesExecuted, byte value) {
+        Y = value;
+        cyclesExecuted.incrementAndGet();
+    }
+
+    private void setAC(byte value) {
+        AC = value;
+        SR.setZero(AC == 0);
+        SR.setNegative(AC < 0);
     }
 
     public byte getA() {
